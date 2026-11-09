@@ -149,10 +149,10 @@ func.func @transfer_read_write_index_1d(%A : memref<?xindex>, %base: index) -> v
 //       CHECK: %[[SPLAT:.*]] = arith.constant dense<7> : vector<17xindex>
 //       CHECK: %{{.*}} = builtin.unrealized_conversion_cast %[[SPLAT]] : vector<17xindex> to vector<17xi64>
 
-//       CHECK: %[[loaded:.*]] = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) :
+//       CHECK: %[[loaded:.*]] = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) :
 //  CHECK-SAME: (!llvm.ptr, vector<17xi1>, vector<17xi64>) -> vector<17xi64>
 
-//       CHECK: llvm.intr.masked.store(%[[loaded]], %{{.*}}, %{{.*}}), alignment(8) :
+//       CHECK: llvm.intr.masked.store(%[[loaded]], %{{.*}}, %{{.*}}), alignment(4) :
 //  CHECK-SAME: vector<17xi64>, vector<17xi1> into !llvm.ptr
 
 func.func @transfer_read_write_index_1d_scalable(%A : memref<?xindex>, %base: index) -> vector<[17]xindex> {
@@ -170,10 +170,10 @@ func.func @transfer_read_write_index_1d_scalable(%A : memref<?xindex>, %base: in
 //       CHECK: %[[SPLAT:.*]] = arith.constant dense<7> : vector<[17]xindex>
 //       CHECK: %{{.*}} = builtin.unrealized_conversion_cast %[[SPLAT]] : vector<[17]xindex> to vector<[17]xi64>
 
-//       CHECK: %[[loaded:.*]] = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) :
+//       CHECK: %[[loaded:.*]] = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) :
 //  CHECK-SAME: (!llvm.ptr, vector<[17]xi1>, vector<[17]xi64>) -> vector<[17]xi64>
 
-//       CHECK: llvm.intr.masked.store(%[[loaded]], %{{.*}}, %{{.*}}), alignment(8) :
+//       CHECK: llvm.intr.masked.store(%[[loaded]], %{{.*}}, %{{.*}}), alignment(4) :
 //  CHECK-SAME: vector<[17]xi64>, vector<[17]xi1> into !llvm.ptr
 
 // -----

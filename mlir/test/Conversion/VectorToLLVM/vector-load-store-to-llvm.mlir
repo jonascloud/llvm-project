@@ -70,7 +70,7 @@ func.func @load_index(%memref : memref<200x100xindex>, %i : index, %j : index) -
   return %0 : vector<8xindex>
 }
 // ALL-LABEL: func @load_index
-// ALL: %[[T0:.*]] = llvm.load %{{.*}} <alignment = 8> : !llvm.ptr -> vector<8xi64>
+// ALL: %[[T0:.*]] = llvm.load %{{.*}} <alignment = 4> : !llvm.ptr -> vector<8xi64>
 // ALL: %[[T1:.*]] = builtin.unrealized_conversion_cast %[[T0]] : vector<8xi64> to vector<8xindex>
 // ALL: return %[[T1]] : vector<8xindex>
 
@@ -81,7 +81,7 @@ func.func @load_index_scalable(%memref : memref<200x100xindex>, %i : index, %j :
   return %0 : vector<[8]xindex>
 }
 // ALL-LABEL: func @load_index_scalable
-// ALL: %[[T0:.*]] = llvm.load %{{.*}} <alignment = 8> : !llvm.ptr -> vector<[8]xi64>
+// ALL: %[[T0:.*]] = llvm.load %{{.*}} <alignment = 4> : !llvm.ptr -> vector<[8]xi64>
 // ALL: %[[T1:.*]] = builtin.unrealized_conversion_cast %[[T0]] : vector<[8]xi64> to vector<[8]xindex>
 // ALL: return %[[T1]] : vector<[8]xindex>
 
@@ -192,7 +192,7 @@ func.func @store_index(%memref : memref<200x100xindex>, %i : index, %j : index) 
   return
 }
 // ALL-LABEL: func @store_index
-// ALL: llvm.store %{{.*}}, %{{.*}} <alignment = 8> : vector<4xi64>, !llvm.ptr
+// ALL: llvm.store %{{.*}}, %{{.*}} <alignment = 4> : vector<4xi64>, !llvm.ptr
 
 // -----
 
@@ -202,7 +202,7 @@ func.func @store_index_scalable(%memref : memref<200x100xindex>, %i : index, %j 
   return
 }
 // ALL-LABEL: func @store_index_scalable
-// ALL: llvm.store %{{.*}}, %{{.*}} <alignment = 8> : vector<[4]xi64>, !llvm.ptr
+// ALL: llvm.store %{{.*}}, %{{.*}} <alignment = 4> : vector<[4]xi64>, !llvm.ptr
 
 // -----
 

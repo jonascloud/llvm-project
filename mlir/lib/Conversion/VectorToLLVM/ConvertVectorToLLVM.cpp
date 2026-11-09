@@ -83,7 +83,7 @@ LogicalResult getVectorAlignment(const LLVMTypeConverter &typeConverter,
   return success();
 }
 
-// Helper that returns data layout alignment of a memref.
+// Helper that returns the ABI alignment of a memref element.
 LogicalResult getMemRefAlignment(const LLVMTypeConverter &typeConverter,
                                  MemRefType memrefType, unsigned &align) {
   Type elementTy = typeConverter.convertType(memrefType.getElementType());
@@ -93,15 +93,18 @@ LogicalResult getMemRefAlignment(const LLVMTypeConverter &typeConverter,
   // TODO: this should use the MLIR data layout when it becomes available and
   // stop depending on translation.
   llvm::LLVMContext llvmContext;
-  align = LLVM::TypeToLLVMIRTranslator(llvmContext)
-              .getPreferredAlignment(elementTy, typeConverter.getDataLayout());
+  LLVM::TypeToLLVMIRTranslator translator(llvmContext);
+  // A preferred alignment need not hold at every element offset.
+  align = typeConverter.getDataLayout()
+              .getABITypeAlign(translator.translateType(elementTy))
+              .value();
   return success();
 }
 
 // Helper to resolve the alignment for vector load/store, gather and scatter
 // ops. If useVectorAlignment is true, get the preferred alignment for the
 // vector type in the operation. This option is used for hardware backends with
-// vectorization. Otherwise, use the preferred alignment of the element type of
+// vectorization. Otherwise, use the ABI alignment of the element type of
 // the memref. Note that if you choose to use vector alignment, the shape of the
 // vector type must be resolved before the ConvertVectorToLLVM pass is run.
 LogicalResult getVectorToLLVMAlignment(const LLVMTypeConverter &typeConverter,
@@ -292,7 +295,7 @@ public:
 
 private:
   // If true, use the preferred alignment of the vector type.
-  // If false, use the preferred alignment of the element type
+  // If false, use the ABI alignment of the element type
   // of the memref. This flag is intended for use with hardware
   // backends that require alignment of vector operations.
   const bool useVectorAlignment;
@@ -351,7 +354,7 @@ public:
 
 private:
   // If true, use the preferred alignment of the vector type.
-  // If false, use the preferred alignment of the element type
+  // If false, use the ABI alignment of the element type
   // of the memref. This flag is intended for use with hardware
   // backends that require alignment of vector operations.
   const bool useVectorAlignment;
@@ -409,7 +412,7 @@ public:
 
 private:
   // If true, use the preferred alignment of the vector type.
-  // If false, use the preferred alignment of the element type
+  // If false, use the ABI alignment of the element type
   // of the memref. This flag is intended for use with hardware
   // backends that require alignment of vector operations.
   const bool useVectorAlignment;

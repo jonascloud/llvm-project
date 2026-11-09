@@ -1733,7 +1733,7 @@ def ConvertVectorToLLVMPass : Pass<"convert-vector-to-llvm"> {
     Option<"useVectorAlignment", "use-vector-alignment",
            "bool", /*default=*/"false",
            "Use the preferred alignment of a vector type in load/store "
-           "operations instead of the alignment of the element type of the "
+           "operations instead of the ABI alignment of the element type of the "
            "memref. This flag is intended for use with hardware which requires"
            "vector alignment, or in application contexts where it is known all "
            "vector access are naturally aligned. If operations have an "

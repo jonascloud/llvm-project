@@ -1610,7 +1610,7 @@ func.func @masked_load_index(%arg0: memref<?xindex>, %arg1: vector<16xi1>, %arg2
   return %0 : vector<16xindex>
 }
 // CHECK-LABEL: func @masked_load_index
-// CHECK: %{{.*}} = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) : (!llvm.ptr, vector<16xi1>, vector<16xi64>) -> vector<16xi64>
+// CHECK: %{{.*}} = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) : (!llvm.ptr, vector<16xi1>, vector<16xi64>) -> vector<16xi64>
 
 // -----
 
@@ -1620,7 +1620,7 @@ func.func @masked_load_index_scalable(%arg0: memref<?xindex>, %arg1: vector<[16]
   return %0 : vector<[16]xindex>
 }
 // CHECK-LABEL: func @masked_load_index_scalable
-// CHECK: %{{.*}} = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) : (!llvm.ptr, vector<[16]xi1>, vector<[16]xi64>) -> vector<[16]xi64>
+// CHECK: %{{.*}} = llvm.intr.masked.load(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) : (!llvm.ptr, vector<[16]xi1>, vector<[16]xi64>) -> vector<[16]xi64>
 
 // -----
 
@@ -1672,7 +1672,7 @@ func.func @masked_store_index(%arg0: memref<?xindex>, %arg1: vector<16xi1>, %arg
   return
 }
 // CHECK-LABEL: func @masked_store_index
-// CHECK: llvm.intr.masked.store(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) : vector<16xi64>, vector<16xi1> into !llvm.ptr
+// CHECK: llvm.intr.masked.store(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) : vector<16xi64>, vector<16xi1> into !llvm.ptr
 
 // -----
 
@@ -1682,7 +1682,7 @@ func.func @masked_store_index_scalable(%arg0: memref<?xindex>, %arg1: vector<[16
   return
 }
 // CHECK-LABEL: func @masked_store_index_scalable
-// CHECK: llvm.intr.masked.store(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) : vector<[16]xi64>, vector<[16]xi1> into !llvm.ptr
+// CHECK: llvm.intr.masked.store(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) : vector<[16]xi64>, vector<[16]xi1> into !llvm.ptr
 
 // -----
 
@@ -1761,7 +1761,7 @@ func.func @gather_index(%arg0: memref<?xindex>, %arg1: vector<3xindex>, %arg2: v
 
 // CHECK-LABEL: func @gather_index
 // CHECK: %[[P:.*]] = llvm.getelementptr %{{.*}}[%{{.*}}] : (!llvm.ptr, vector<3xi64>) -> vector<3x!llvm.ptr>, i64
-// CHECK: %[[G:.*]] = llvm.intr.masked.gather(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) : (vector<3x!llvm.ptr>, vector<3xi1>, vector<3xi64>) -> vector<3xi64>
+// CHECK: %[[G:.*]] = llvm.intr.masked.gather(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) : (vector<3x!llvm.ptr>, vector<3xi1>, vector<3xi64>) -> vector<3xi64>
 // CHECK: %{{.*}} = builtin.unrealized_conversion_cast %[[G]] : vector<3xi64> to vector<3xindex>
 
 // -----
@@ -1774,7 +1774,7 @@ func.func @gather_index_scalable(%arg0: memref<?xindex>, %arg1: vector<[3]xindex
 
 // CHECK-LABEL: func @gather_index_scalable
 // CHECK: %[[P:.*]] = llvm.getelementptr %{{.*}}[%{{.*}}] : (!llvm.ptr, vector<[3]xi64>) -> vector<[3]x!llvm.ptr>, i64
-// CHECK: %[[G:.*]] = llvm.intr.masked.gather(%{{.*}}, %{{.*}}, %{{.*}}), alignment(8) : (vector<[3]x!llvm.ptr>, vector<[3]xi1>, vector<[3]xi64>) -> vector<[3]xi64>
+// CHECK: %[[G:.*]] = llvm.intr.masked.gather(%{{.*}}, %{{.*}}, %{{.*}}), alignment(4) : (vector<[3]x!llvm.ptr>, vector<[3]xi1>, vector<[3]xi64>) -> vector<[3]xi64>
 // CHECK: %{{.*}} = builtin.unrealized_conversion_cast %[[G]] : vector<[3]xi64> to vector<[3]xindex>
 
 // -----
@@ -1867,7 +1867,7 @@ func.func @scatter_index(%arg0: memref<?xindex>, %arg1: vector<3xindex>, %arg2: 
 
 // CHECK-LABEL: func @scatter_index
 // CHECK: %[[P:.*]] = llvm.getelementptr %{{.*}}[%{{.*}}] : (!llvm.ptr, vector<3xi64>) -> vector<3x!llvm.ptr>, i64
-// CHECK: llvm.intr.masked.scatter(%{{.*}}, %[[P]], %{{.*}}), alignment(8) : vector<3xi64>, vector<3xi1> into vector<3x!llvm.ptr>
+// CHECK: llvm.intr.masked.scatter(%{{.*}}, %[[P]], %{{.*}}), alignment(4) : vector<3xi64>, vector<3xi1> into vector<3x!llvm.ptr>
 
 // -----
 
@@ -1879,7 +1879,7 @@ func.func @scatter_index_scalable(%arg0: memref<?xindex>, %arg1: vector<[3]xinde
 
 // CHECK-LABEL: func @scatter_index_scalable
 // CHECK: %[[P:.*]] = llvm.getelementptr %{{.*}}[%{{.*}}] : (!llvm.ptr, vector<[3]xi64>) -> vector<[3]x!llvm.ptr>, i64
-// CHECK: llvm.intr.masked.scatter(%{{.*}}, %[[P]], %{{.*}}), alignment(8) : vector<[3]xi64>, vector<[3]xi1> into vector<[3]x!llvm.ptr>
+// CHECK: llvm.intr.masked.scatter(%{{.*}}, %[[P]], %{{.*}}), alignment(4) : vector<[3]xi64>, vector<[3]xi1> into vector<[3]x!llvm.ptr>
 
 // -----
 
