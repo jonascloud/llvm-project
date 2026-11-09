@@ -1,0 +1,58 @@
+name: Vector alignment regression
+
+on:
+  push:
+    branches: [fix/vector-element-abi-alignment-ci]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 3
+          persist-credentials: false
+      - name: Configure
+        run: |
+          mkdir results
+          cmake -S llvm -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+            -DLLVM_ENABLE_PROJECTS=mlir -DLLVM_TARGETS_TO_BUILD=Native \
+            -DLLVM_ENABLE_ASSERTIONS=ON -DLLVM_ENABLE_LLD=ON \
+            -DLLVM_PARALLEL_COMPILE_JOBS=2 -DLLVM_PARALLEL_LINK_JOBS=1 \
+            -DMLIR_ENABLE_EXECUTION_ENGINE=OFF
+      - name: Build original lowering with regression tests
+        run: |
+          git show HEAD~2:mlir/lib/Conversion/VectorToLLVM/ConvertVectorToLLVM.cpp \
+            > mlir/lib/Conversion/VectorToLLVM/ConvertVectorToLLVM.cpp
+          cmake --build build --target mlir-opt FileCheck not count -j 2
+      - name: Confirm regression fails before the fix
+        run: |
+          test_file=mlir/test/Conversion/VectorToLLVM/element-alignment.mlir
+          build/bin/mlir-opt "$test_file" --convert-vector-to-llvm > results/baseline.mlir
+          if build/bin/FileCheck "$test_file" --check-prefixes=CHECK,ABI \
+              < results/baseline.mlir > results/baseline-check.log 2>&1; then
+            echo 'Regression unexpectedly passed before the fix'
+            exit 1
+          fi
+          grep -q 'alignment = 8' results/baseline.mlir
+          grep -q 'ABI: expected string not found' results/baseline-check.log
+          cat results/baseline-check.log
+      - name: Build fixed lowering and run VectorToLLVM tests
+        shell: bash
+        run: |
+          git restore --source=HEAD -- mlir/lib/Conversion/VectorToLLVM/ConvertVectorToLLVM.cpp
+          cmake --build build --target mlir-opt -j 2
+          build/bin/llvm-lit -sv -j 2 build/tools/mlir/test/Conversion/VectorToLLVM \
+            --xunit-xml-output=results/vector-to-llvm.xml | tee results/vector-to-llvm.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: vector-alignment-results
+          path: results/
+          retention-days: 7
